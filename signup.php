@@ -1,46 +1,53 @@
 <?php
+
 require_once 'config/db.php';
 global $con;
 $whatiwant = null;
-if($_SERVER['REQUEST_METHOD']=="POST"){
-//    $nom = $_POST['nom'];
-//    $email = $_POST['email'];
-//    $password = password_hash($_POST['password'],PASSWORD_DEFAULT) ;
-//    $phone = $_POST['phone'];
-//    $role = $_POST['role'];
 
-    $whatiwant=['nom','email','password','phone','role'];
-    if(!empty($_POST['role']) && $_POST['role']==='coach'){
-//        $exp_years = $_POST['exp_years'];
-//        $bio = $_POST['bio'];
-//        $pic_url = $_POST['pic_url'];
-//        $niveau = $_POST['niveau'];
-        array_push($whatiwant,'exp_years','bio','pic_url','niveau');
+$con->begin_transaction();
+try {
+
+    if ($_SERVER['REQUEST_METHOD'] == "POST") {
+        $whatiwant = ['nom', 'email', 'password', 'phone', 'role' , 'exp_years', 'bio', 'pic_url', 'niveau' ];
+
+        if (!empty($_POST['role']) && $_POST['role'] === 'coach') {
+            array_push($whatiwant, );
+        }
+
+
+        if ($dt = checkMe($whatiwant)) {
+            $dt['password'] = password_hash($dt['password'], PASSWORD_DEFAULT);
+            $dt['phone'] = intval($dt['phone']);
+            $query = "insert into user(nom,email,password,phone,role) values(?,?,?,?,?) ";
+            $statement = $con->prepare($query);
+            $statement->bind_param("sssis", $dt['nom'], $dt['email'], $dt['password'], $dt['phone'], $dt['role']);
+            $statement->execute();
+            $userId = $con->insert_id;
+
+
+            if($dt['role'] === 'client'){
+                $query1 = "  ";
+            } elseif ($dt['role'] === 'coach') {
+                $query2= "insert into coach (coachID,exp_years,bio,pic_url,niveau) values (?,?,?,?,?)";
+                $statement = $con->prepare($query2);
+                $exp = intval($dt['exp_years']);
+                $statement->bind_param("iisss",$userId,$exp, $dt['bio'], $dt['pic_url'], $dt['niveau']);
+                $statement->execute();
+                $certificats = $_POST[''];
+
+
+
+
+            } else {
+                exit();
+            }
+//            $statement->execute();
     }
-    if($dt = checkMe($whatiwant)){
-        $dt['password']=password_hash($dt['password'],PASSWORD_DEFAULT);
-        $query="insert into user(nom,email,password,phone,role";
-        $values =") values(?,?,?,?,?";
-
-        if ($dt['role']==='client'){
-            $query.=")";
-            $values .=")";
-            $statement = $con->prepare($query.$values);
-            $statement->bind_param("sssis",$dt['nom'],$dt['email'],$dt['password'],$dt['phone'],$dt['role']);
-
-        }
-        elseif ($dt['role']==='coach'){
-            $query .= ",exp_years,bio,pic_url,niveau";
-            $values.=",?,?,?,?)";
-            $statement = $con->prepare($query.$values);
-            $statement->bind_param("sssisisss",$dt['nom'],$dt['email'],$dt['password'],$dt['phone'],$dt['role'],$dt['exp_years'],$dt['bio'],$dt['pic_url'],$dt['niveau']);
-        }
-        else{
-            exit();
-        }
-        $statement->execute();
     }
+}catch (mysqli_sql_exception $e) {
+    die("SQL FAILED: " . $e->getMessage());
 }
+
 
 function checkMe(array $what){
     $data=[];
@@ -72,7 +79,7 @@ function checkMe(array $what){
             <!-- Logo linking to index.html -->
             <a href="index.php" class="block text-2xl font-bold text-green-600 text-center mb-6">CoachPro</a>
             <h2 class="text-2xl font-bold mb-6">Inscription</h2>
-            <form id="signupForm" method="POST" action="login.php">
+            <form id="signupForm" method="POST" action="">
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">Nom</label>
@@ -210,35 +217,34 @@ function checkMe(array $what){
             }
         }
         
-        // Signup validation
         document.getElementById('signupForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault()
             let valid = true;
-            
+
             // Hide all errors
             document.querySelectorAll('[class^="error-"]').forEach(el => el.classList.add('hidden'));
-            
+
             // Validate email
             const email = this.email.value;
             if (!isValidEmail(email)) {
                 showError('error-email', 'Format email invalide');
                 valid = false;
             }
-            
+
             // Validate password
             const password = this.password.value;
             if (!isValidPassword(password)) {
                 showError('error-password', 'Le mot de passe doit contenir au moins 6 caractères avec lettres et chiffres');
                 valid = false;
             }
-            
+
             // Validate phone
-            const phone = this.phone.value;
-            if (!isValidPhone(phone)) {
-                showError('error-phone', 'Numéro de téléphone invalide');
-                valid = false;
-            }
-            
+            // const phone = this.phone.value;
+            // if (!isValidPhone(phone)) {
+            //     showError('error-phone', 'Numéro de téléphone invalide');
+            //     valid = false;
+            // }
+
             // Coach-specific validation
             if (this.role.value === 'coach') {
                 const sports = this.querySelectorAll('input[name="sports[]"]:checked');
@@ -247,10 +253,10 @@ function checkMe(array $what){
                     valid = false;
                 }
             }
-            
+
             if (valid) {
                 showToast('Inscription réussie!', 'success');
-                // this.submit(); // Uncomment when backend is ready
+                this.submit();
             }
         });
         
