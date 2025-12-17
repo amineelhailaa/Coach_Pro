@@ -4,9 +4,9 @@ $user = 'root';
 $pw = '281102';
 $db='coach_Pro';
 
-try {
-    $con=mysqli_connect($host,$user,$pw,$db);
-}
-catch (mysqli_sql_exception){
-    echo "srry";
+
+$con= new mysqli($host,$user,$pw,$db);
+
+if ($con->connect_error){
+    die("cant connect".$con->connect_error);
 }

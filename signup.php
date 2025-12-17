@@ -1,29 +1,47 @@
 <?php
 require_once 'config/db.php';
+global $con;
 $whatiwant = null;
 if($_SERVER['REQUEST_METHOD']=="POST"){
-    $nom = $_POST['nom'];
-    $email = $_POST['email'];
-    $password = password_hash($_POST['password'],PASSWORD_DEFAULT) ;
-    $phone = $_POST['phone'];
-    $role = $_POST['role'];
+//    $nom = $_POST['nom'];
+//    $email = $_POST['email'];
+//    $password = password_hash($_POST['password'],PASSWORD_DEFAULT) ;
+//    $phone = $_POST['phone'];
+//    $role = $_POST['role'];
 
     $whatiwant=['nom','email','password','phone','role'];
-    if(!empty($role) && $role==='coach'){
-        $exp_years = $_POST['exp_years'];
-        $bio = $_POST['bio'];
-        $pic_url = $_POST['pic_url'];
-        $niveau = $_POST['niveau'];
+    if(!empty($_POST['role']) && $_POST['role']==='coach'){
+//        $exp_years = $_POST['exp_years'];
+//        $bio = $_POST['bio'];
+//        $pic_url = $_POST['pic_url'];
+//        $niveau = $_POST['niveau'];
         array_push($whatiwant,'exp_years','bio','pic_url','niveau');
     }
-}
-if($dt = checkMe($whatiwant)){
-    $dt['password']=password_hash($dt['password'],PASSWORD_DEFAULT);
-}
-    if ($dt['role']==='client'){
-        $query = "insert into user(nom,email,password,phone,role) VALUES ('$dt['nom']')
+    if($dt = checkMe($whatiwant)){
+        $dt['password']=password_hash($dt['password'],PASSWORD_DEFAULT);
+        $query="insert into user(nom,email,password,phone,role";
+        $values =") values(?,?,?,?,?";
+
+        if ($dt['role']==='client'){
+            $query.=")";
+            $values .=")";
+            $statement = $con->prepare($query.$values);
+            $statement->bind_param("sssis",$dt['nom'],$dt['email'],$dt['password'],$dt['phone'],$dt['role']);
+
+        }
+        elseif ($dt['role']==='coach'){
+            $query .= ",exp_years,bio,pic_url,niveau";
+            $values.=",?,?,?,?)";
+            $statement = $con->prepare($query.$values);
+            $statement->bind_param("sssisisss",$dt['nom'],$dt['email'],$dt['password'],$dt['phone'],$dt['role'],$dt['exp_years'],$dt['bio'],$dt['pic_url'],$dt['niveau']);
+        }
+        else{
+            exit();
+        }
+        $statement->execute();
     }
 }
+
 function checkMe(array $what){
     $data=[];
     foreach ($what as $key ){
