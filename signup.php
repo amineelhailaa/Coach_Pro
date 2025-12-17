@@ -1,3 +1,45 @@
+<?php
+require_once 'config/db.php';
+$whatiwant = null;
+if($_SERVER['REQUEST_METHOD']=="POST"){
+    $nom = $_POST['nom'];
+    $email = $_POST['email'];
+    $password = password_hash($_POST['password'],PASSWORD_DEFAULT) ;
+    $phone = $_POST['phone'];
+    $role = $_POST['role'];
+
+    $whatiwant=['nom','email','password','phone','role'];
+    if(!empty($role) && $role==='coach'){
+        $exp_years = $_POST['exp_years'];
+        $bio = $_POST['bio'];
+        $pic_url = $_POST['pic_url'];
+        $niveau = $_POST['niveau'];
+        array_push($whatiwant,'exp_years','bio','pic_url','niveau');
+    }
+}
+if($dt = checkMe($whatiwant)){
+    $dt['password']=password_hash($dt['password'],PASSWORD_DEFAULT);
+}
+    if ($dt['role']==='client'){
+        $query = "insert into user(nom,email,password,phone,role) VALUES ('$dt['nom']')
+    }
+}
+function checkMe(array $what){
+    $data=[];
+    foreach ($what as $key ){
+        if (!isset($_POST[$key]) || trim($_POST[$key]) === '') {
+            return false;
+        }
+        $data[$key] = trim($_POST[$key]);
+    }
+
+    return $data;
+}
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,7 +54,7 @@
             <!-- Logo linking to index.html -->
             <a href="index.php" class="block text-2xl font-bold text-green-600 text-center mb-6">CoachPro</a>
             <h2 class="text-2xl font-bold mb-6">Inscription</h2>
-            <form id="signupForm" method="POST" action="/signup.php">
+            <form id="signupForm" method="POST" action="login.php">
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">Nom</label>
