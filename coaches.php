@@ -1,3 +1,13 @@
+<?php
+session_start();
+if(!isset($_SESSION['user_id'])){
+    header("location: login.php");
+}
+if($_SESSION['role']!='client'){
+    header("location: coach-dashboard.php");
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
