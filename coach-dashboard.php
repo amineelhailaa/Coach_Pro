@@ -4,7 +4,7 @@ if(!isset($_SESSION['user_id'])){
     header("location: login.php");
 }
 if($_SESSION['role']!='coach'){
-    header("location: coach-dashboard.php");
+    header("location: client-dashboard.php");
 }
 ?>
 

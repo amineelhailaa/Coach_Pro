@@ -24,7 +24,7 @@ try {
 
 
             if ($dt['role'] === 'client') {
-                $query1 = "  ";
+                $ldire;
             } elseif ($dt['role'] === 'coach') {
 
                 //                if (!empty($_POST['role']) && $_POST['role'] === 'coach') {

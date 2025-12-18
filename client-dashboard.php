@@ -1,11 +1,19 @@
 <?php
 session_start();
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 if(!isset($_SESSION['user_id'])){
     header("location: login.php");
 }
 if($_SESSION['role']!='client'){
     header("location: coach-dashboard.php");
 }
+require_once "collect_data/client.php";
+//var_dump($id);
+
 ?>
 
 
@@ -44,17 +52,17 @@ if($_SESSION['role']!='client'){
                     <div class="space-y-4">
                         <div>
                             <label class="block font-medium mb-1">Name</label>
-                            <input type="text" name="nom" value="John Doe" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" name="nom" value="<?php echo $row['nom']?>" class="w-full px-3 py-2 border rounded-lg">
                         </div>
                         
                         <div>
                             <label class="block font-medium mb-1">Email</label>
-                            <input type="email" name="email" value="john@example.com" disabled class="w-full px-3 py-2 border rounded-lg bg-gray-100">
+                            <input type="email" name="email" value="<?php echo $row['email']?>" disabled class="w-full px-3 py-2 border rounded-lg bg-gray-100">
                         </div>
                         
                         <div>
                             <label class="block font-medium mb-1">Phone</label>
-                            <input type="tel" name="phone" value="1234567890" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="tel" name="phone" value="<?php echo $row['phone']?>" class="w-full px-3 py-2 border rounded-lg">
                         </div>
                         
                         <!-- green button -->

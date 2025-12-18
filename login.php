@@ -8,7 +8,7 @@ global $con;
 session_start();
 $login = true;
 try {
-    if(!isset($_SESSION['user'])){
+    if(!isset($_SESSION['user_id'])){
         $check= $con->prepare("select user.id as myid, user.email, user.password ,u.id , c.coachID ,user.role as myrole from user left join client u on u.id = user.id left join coach c on c.coachID = user.id where user.email=? ");
         if($data = checkMe(['email','password'])){
         $check->bind_param("s",$data['email'],);
@@ -28,10 +28,9 @@ try {
                 header("location: ".$user['myrole']."-dashboard.php");
             }
         }
-        echo "amine is here";
     }
     else{
-        header("location: ".$_SESSION['myrole']."-dashboard.php");
+        header("location: ".$_SESSION['role']."-dashboard.php");
     }
 }catch (mysqli_sql_exception $e) {
     die("SQL FAILED: " . $e->getMessage());
