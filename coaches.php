@@ -103,13 +103,22 @@ if($_SESSION['role']!='client'){
     <script src="app.js"></script>
     <script>
         // Mock coaches data with rating
-        const allCoaches = [
-            { id: 1, name: 'John Smith', sports: ['Football', 'Basketball'], niveau: 'Pro', exp_years: 10, rating: 4.8, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Professional coach with international experience' },
-            { id: 2, name: 'Sarah Johnson', sports: ['Tennis'], niveau: 'Advanced', exp_years: 7, rating: 4.9, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Former professional tennis player' },
-            { id: 3, name: 'Mike Davis', sports: ['Swimming'], niveau: 'Pro', exp_years: 12, rating: 5.0, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Olympic swimming coach' },
-            { id: 4, name: 'Emma Wilson', sports: ['Football'], niveau: 'Intermediate', exp_years: 5, rating: 4.5, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Youth development specialist' },
-            { id: 5, name: 'David Lee', sports: ['Basketball', 'Tennis'], niveau: 'Advanced', exp_years: 8, rating: 4.7, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Multi-sport coach' }
-        ];
+
+        async  function fetchFromPHPCoachs(){
+            const json = await fetch("api/coaches.php");
+            return json.json();
+        }
+
+        // const allCoaches = [
+        //     { id: 1, name: 'John Smith', sports: ['Football', 'Basketball'], niveau: 'Pro', exp_years: 10, rating: 4.8, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Professional coach with international experience' },
+        //     { id: 2, name: 'Sarah Johnson', sports: ['Tennis'], niveau: 'Advanced', exp_years: 7, rating: 4.9, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Former professional tennis player' },
+        //     { id: 3, name: 'Mike Davis', sports: ['Swimming'], niveau: 'Pro', exp_years: 12, rating: 5.0, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Olympic swimming coach' },
+        //     { id: 4, name: 'Emma Wilson', sports: ['Football'], niveau: 'Intermediate', exp_years: 5, rating: 4.5, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Youth development specialist' },
+        //     { id: 5, name: 'David Lee', sports: ['Basketball', 'Tennis'], niveau: 'Advanced', exp_years: 8, rating: 4.7, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Multi-sport coach' }
+        // ];
+        let allCoaches = []
+        fetchFromPHPCoachs().then(data=> allCoaches = data
+        console.log(allCoaches))
         
         function renderCoaches(coaches) {
             const container = document.getElementById('coachesList');
