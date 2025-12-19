@@ -1,14 +1,18 @@
 <?php
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+ini_set('display_errors', 1);
+
 session_start();
 require_once "./config/db.php";
-$id = $_SESSION['id'];
-$coach = $_GET['id'];
+$user = $_SESSION['user_id'];
+$id = intval($_GET['id']);
+var_dump($user,$id);
 if($_SERVER['REQUEST_METHOD']==="POST"){
-    $statement = $con->prepare("insert into reservation (client_id,coach_id,start_date,duree,status) values (?,?,?,?,? ");
+    $statement = $con->prepare("insert into reservation (client_id,coach_id,start_date,duree,status) values (?,?,?,?,? )");
 $start = $_POST['start_date'];
 $duree= $_POST['duree'];
 $status = "in progress";
-    $statement->bind_param("iisis",$id,$coach,$start,$duree,$status);
+    $statement->bind_param("iisis",$user,$id,$start,$duree,$status);
     $statement->execute();
 }
 
