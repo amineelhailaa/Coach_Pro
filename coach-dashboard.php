@@ -1,11 +1,27 @@
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
+require_once "./config/db.php";
 if(!isset($_SESSION['user_id'])){
     header("location: login.php");
 }
 if($_SESSION['role']!='coach'){
     header("location: client-dashboard.php");
 }
+$id = $_SESSION['user_id'];
+if($_SERVER['REQUEST_METHOD']=="POST"){
+    $statement = $con->prepare("insert into disponible (id_coach,week_day,start_time,end_time) values (?,?,?,?)");
+    $weekday = $_POST['week_day'];
+    $startTime = $_POST['start_time'];
+    $endTime = $_POST['end_time'];
+    $statement->bind_param("isss",$id,$weekday,$startTime,$endTime);
+    $statement->execute();
+
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +110,7 @@ if($_SESSION['role']!='coach'){
         <div id="availabilityTab" class="tab-content hidden">
             <div class="bg-white p-6 rounded-lg shadow mb-6">
                 <h2 class="text-xl font-bold mb-4">Add Availability</h2>
-                <form id="addAvailabilityForm" method="POST" action="/coach/availability/create.php">
+                <form id="addAvailabilityForm" method="POST" action="">
                     <div class="grid md:grid-cols-3 gap-4">
                         <div>
                             <label class="block font-medium mb-2">Day of Week</label>

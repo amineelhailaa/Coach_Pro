@@ -7,9 +7,11 @@ error_reporting(E_ALL);
 
 if(!isset($_SESSION['user_id'])){
     header("location: login.php");
+    exit();
 }
 if($_SESSION['role']!='client'){
     header("location: coach-dashboard.php");
+    exit();
 }
 require_once "collect_data/client.php";
 //var_dump($id);

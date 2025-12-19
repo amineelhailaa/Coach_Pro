@@ -1,10 +1,16 @@
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
 if(!isset($_SESSION['user_id'])){
     header("location: login.php");
+    exit();
 }
 if($_SESSION['role']!='client'){
     header("location: coach-dashboard.php");
+    exit();
 }
 ?>
 
@@ -117,8 +123,15 @@ if($_SESSION['role']!='client'){
         //     { id: 5, name: 'David Lee', sports: ['Basketball', 'Tennis'], niveau: 'Advanced', exp_years: 8, rating: 4.7, pic_url: '/placeholder.svg?height=200&width=200', bio: 'Multi-sport coach' }
         // ];
         let allCoaches = []
-        fetchFromPHPCoachs().then(data=> allCoaches = data
-        console.log(allCoaches))
+        try {
+            fetchFromPHPCoachs().then(data => {
+                allCoaches = data
+                console.log(allCoaches)
+                renderCoaches(allCoaches)
+            })
+        }catch (e){
+            console.error(e);
+        }
         
         function renderCoaches(coaches) {
             const container = document.getElementById('coachesList');
@@ -133,8 +146,8 @@ if($_SESSION['role']!='client'){
                 const card = document.createElement('div');
                 card.className = 'bg-white p-6 rounded-lg shadow hover:shadow-lg transition';
                 card.innerHTML = `
-                    <img src="${coach.pic_url}" alt="${coach.name}" class="w-full h-48 object-cover rounded-lg mb-4">
-                    <h3 class="text-xl font-bold mb-2">${coach.name}</h3>
+                    <img src="${coach.pic_url}" alt="${coach.nom}" class="w-full h-48 object-cover rounded-lg mb-4">
+                    <h3 class="text-xl font-bold mb-2">${coach.nom}</h3>
                     <div class="flex flex-wrap gap-2 mb-2">
                         ${coach.sports.map(s => `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">${s}</span>`).join('')}
                     </div>
@@ -174,7 +187,7 @@ if($_SESSION['role']!='client'){
         }
         
         // Initial render
-        renderCoaches(allCoaches);
+        // renderCoaches(allCoaches);
         
         // Mobile menu
         document.getElementById('mobileMenuBtn').addEventListener('click', function() {

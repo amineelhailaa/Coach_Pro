@@ -1,3 +1,10 @@
+<?php
+
+$id = $_GET['id'];
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,32 +131,46 @@
     <script src="app.js"></script>
     <script>
         // Mock coach data
-        const coach = {
-            id: 1,
-            name: 'John Smith',
-            sports: ['Football', 'Basketball'],
-            niveau: 'Pro',
-            exp_years: 10,
-            pic_url: '/placeholder.svg?height=200&width=200',
-            bio: 'Professional coach with 10 years of experience. Worked with national teams and helped athletes achieve their goals.',
-            certifications: [
-                { title: 'UEFA Pro License', provider: 'UEFA' },
-                { title: 'Sports Science Diploma', provider: 'University of Sports' }
-            ],
-            availability: [
-                { day: 'Mon', start: '09:00', end: '17:00' },
-                { day: 'Wed', start: '10:00', end: '18:00' },
-                { day: 'Fri', start: '09:00', end: '15:00' }
-            ],
-            reviews: [
-                { client: 'Alice Brown', date: '2024-01-15', text: 'Excellent coach! Very professional and knowledgeable.' },
-                { client: 'Bob Wilson', date: '2024-01-10', text: 'Great experience, highly recommend!' }
-            ]
-        };
+            async function recupuserdata() {
+            let data = await fetch("./api/coach.php?id=<?php echo $id;?>")
+             return data.json();
+        }
+
+
+
+        const coach = recupuserdata()
+        //    coach = {
+        //     id: 1,
+        //     name: 'John Smith',
+        //     sports: ['Football', 'Basketball'],
+        //     niveau: 'Pro',
+        //     exp_years: 10,
+        //     pic_url: '/placeholder.svg?height=200&width=200',
+        //     bio: 'Professional coach with 10 years of experience. Worked with national teams and helped athletes achieve their goals.',
+        //     certifications: [
+        //         { title: 'UEFA Pro License', provider: 'UEFA' },
+        //         { title: 'Sports Science Diploma', provider: 'University of Sports' }
+        //     ],
+        //     availability: [
+        //         { day: 'Mon', start: '09:00', end: '17:00' },
+        //         { day: 'Wed', start: '10:00', end: '18:00' },
+        //         { day: 'Fri', start: '09:00', end: '15:00' }
+        //     ],
+        //     reviews: [
+        //         { client: 'Alice Brown', date: '2024-01-15', text: 'Excellent coach! Very professional and knowledgeable.' },
+        //         { client: 'Bob Wilson', date: '2024-01-10', text: 'Great experience, highly recommend!' }
+        //     ]
+        // };
         
         // Render coach info
+
+
+            .then(coach =>{
+        console.log(coach)
+
+
         document.getElementById('coachPhoto').src = coach.pic_url;
-        document.getElementById('coachName').textContent = coach.name;
+        document.getElementById('coachName').textContent = coach.nom;
         document.getElementById('coachLevel').textContent = `${coach.niveau} • ${coach.exp_years} years experience`;
         document.getElementById('coachBio').textContent = coach.bio;
         
@@ -182,7 +203,9 @@
         });
         
         function selectDay(day) {
-            const availability = coach.availability.find(a => a.day === day);
+            const availability = coach.disponibilite.find(d => d.week_day === day);
+
+            //NEED DISPONIBILITE
             const timeSlotsContainer = document.getElementById('timeSlotsContainer');
             const timeSlots = document.getElementById('timeSlots');
             
@@ -190,35 +213,52 @@
                 timeSlotsContainer.classList.remove('hidden');
                 timeSlots.innerHTML = '';
                 
-                const start = parseInt(availability.start.split(':')[0]);
-                const end = parseInt(availability.end.split(':')[0]);
+                const start = parseInt(availability.start_time.split(':')[0]);
+                const end = parseInt(availability.end_time.split(':')[0]);
                 
                 for (let hour = start; hour < end; hour++) {
                     const btn = document.createElement('button');
-                    btn.className = 'px-3 py-2 border rounded-lg hover:bg-green-100';
-                    btn.textContent = `${hour.toString().padStart(2, '0')}:00`;
+                    btn.className = 'iam px-3 py-2 border rounded-lg hover:bg-green-100';
+                    btn.textContent = `${hour.toString().padStart(2, '0')}:00-${(hour+1).toString().padStart(2, '0')}:00`;
+                    btn.addEventListener('click',e=>{
+
+                        let boolean = false;
+                        document.querySelectorAll(".iam").forEach(bt=>{
+                            if(btn.classList.contains("selected")){
+                                boolean = true;
+                            }
+                        })
+                        if (!boolean){
+                            e.target.closest('.iam').classList.add("selected");
+                        }
+
+
+
+                    })
                     timeSlots.appendChild(btn);
+
                 }
             } else {
                 timeSlotsContainer.classList.add('hidden');
                 showToast('No availability on this day', 'error');
             }
         }
-        
-        // Render reviews
-        const reviewsList = document.getElementById('reviewsList');
-        coach.reviews.forEach(review => {
-            const div = document.createElement('div');
-            div.className = 'border-b pb-4';
-            div.innerHTML = `
-                <div class="font-medium">${review.client}</div>
-                <div class="text-sm text-gray-600 mb-2">${review.date}</div>
-                <div class="text-gray-700">${review.text}</div>
-            `;
-            reviewsList.appendChild(div);
-        });
-        
-        function openBookingModal() {
+
+        // Render reviews --------------------------------drori
+        // const reviewsList = document.getElementById('reviewsList');
+        // coach.reviews.forEach(review => {
+        //     const div = document.createElement('div');
+        //     div.className = 'border-b pb-4';
+        //     div.innerHTML = `
+        //         <div class="font-medium">${review.client}</div>
+        //         <div class="text-sm text-gray-600 mb-2">${review.date}</div>
+        //         <div class="text-gray-700">${review.text}</div>
+        //     `;
+        //     reviewsList.appendChild(div);
+        // });
+                document.getElementById('bookingModal').classList.remove('hidden');
+
+                function openBookingModal() {
             document.getElementById('modalCoachId').value = coach.id;
             document.getElementById('bookingModal').classList.remove('hidden');
         }
@@ -242,6 +282,9 @@
                 document.getElementById('reviewCharCount').textContent = this.value.length;
             });
         }
+
+
+        });
     </script>
 </body>
 </html>
