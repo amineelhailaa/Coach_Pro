@@ -1,6 +1,16 @@
 <?php
-
-$id = $_GET['id'];
+session_start();
+require_once "./config/db.php";
+$id = $_SESSION['id'];
+$coach = $_GET['id'];
+if($_SERVER['REQUEST_METHOD']==="POST"){
+    $statement = $con->prepare("insert into reservation (client_id,coach_id,start_date,duree,status) values (?,?,?,?,? ");
+$start = $_POST['start_date'];
+$duree= $_POST['duree'];
+$status = "in progress";
+    $statement->bind_param("iisis",$id,$coach,$start,$duree,$status);
+    $statement->execute();
+}
 
 
 ?>
@@ -79,7 +89,7 @@ $id = $_GET['id'];
     <div id="bookingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-lg p-8 max-w-md w-full">
             <h3 class="text-2xl font-bold mb-4">Confirm Booking</h3>
-            <form method="POST" action="/reserve.php">
+            <form method="POST" action="">
                 <input type="hidden" name="coach_id" id="modalCoachId">
                 
                 <div class="mb-4">
@@ -173,7 +183,7 @@ $id = $_GET['id'];
         document.getElementById('coachName').textContent = coach.nom;
         document.getElementById('coachLevel').textContent = `${coach.niveau} • ${coach.exp_years} years experience`;
         document.getElementById('coachBio').textContent = coach.bio;
-        
+
         const sportsContainer = document.getElementById('coachSports');
         coach.sports.forEach(sport => {
             const badge = document.createElement('span');
@@ -181,7 +191,7 @@ $id = $_GET['id'];
             badge.textContent = sport;
             sportsContainer.appendChild(badge);
         });
-        
+
         // Render certifications - green border
         const certsList = document.getElementById('certificationsList');
         coach.certifications.forEach(cert => {
@@ -190,7 +200,7 @@ $id = $_GET['id'];
             div.innerHTML = `<div class="font-medium">${cert.title}</div><div class="text-sm text-gray-600">${cert.provider}</div>`;
             certsList.appendChild(div);
         });
-        
+
         // Render availability day buttons
         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const dayButtons = document.getElementById('dayButtons');
@@ -201,21 +211,21 @@ $id = $_GET['id'];
             btn.onclick = () => selectDay(day);
             dayButtons.appendChild(btn);
         });
-        
+
         function selectDay(day) {
             const availability = coach.disponibilite.find(d => d.week_day === day);
 
             //NEED DISPONIBILITE
             const timeSlotsContainer = document.getElementById('timeSlotsContainer');
             const timeSlots = document.getElementById('timeSlots');
-            
+
             if (availability) {
                 timeSlotsContainer.classList.remove('hidden');
                 timeSlots.innerHTML = '';
-                
+
                 const start = parseInt(availability.start_time.split(':')[0]);
                 const end = parseInt(availability.end_time.split(':')[0]);
-                
+
                 for (let hour = start; hour < end; hour++) {
                     const btn = document.createElement('button');
                     btn.className = 'iam px-3 py-2 border rounded-lg hover:bg-green-100';
@@ -223,7 +233,7 @@ $id = $_GET['id'];
                     btn.addEventListener('click',e=>{
 
                         let boolean = false;
-                        document.querySelectorAll(".iam").forEach(bt=>{
+                        document.querySelectorAll(".iam").forEach(btn=>{
                             if(btn.classList.contains("selected")){
                                 boolean = true;
                             }
@@ -256,17 +266,16 @@ $id = $_GET['id'];
         //     `;
         //     reviewsList.appendChild(div);
         // });
-                document.getElementById('bookingModal').classList.remove('hidden');
+            });
 
                 function openBookingModal() {
-            document.getElementById('modalCoachId').value = coach.id;
             document.getElementById('bookingModal').classList.remove('hidden');
         }
-        
+
         function closeBookingModal() {
             document.getElementById('bookingModal').classList.add('hidden');
         }
-        
+
         function openReviewSubmitModal() {
             document.getElementById('reviewCoachId').value = coach.id;
             document.getElementById('reviewSubmitModal').classList.remove('hidden');
@@ -284,7 +293,6 @@ $id = $_GET['id'];
         }
 
 
-        });
     </script>
 </body>
 </html>

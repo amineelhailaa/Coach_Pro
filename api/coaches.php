@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 require_once "../config/db.php";
-global $con ;
+global $con;
 $result = $con->query("select * from coach c inner join user u on c.coachID = u.id ");
 $rows=[];
 if (!$result) {
